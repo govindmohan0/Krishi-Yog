@@ -9,7 +9,7 @@ import { EmptyState, SearchInput, Trending } from "../../components";
 import ImageCard from "../../components/ImageCard";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { translation } from "../../components/utils"
+
 import { Pressable } from "react-native";
 import LanguageModal from "../../components/LanguageModal";
 
@@ -33,40 +33,30 @@ const Home = () => {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-    <SafeAreaView className="bg-white">
-      <FlatList
-        data={posts}
-        keyExtractor={(item) => item.$id}
-        renderItem={({ item }) => (
-          <ImageCard
-            title={item.title}
-            image={item.image}
-            creator={item.creator.username}
-            avatar={item.creator.avatar}
-          />
-        )}
-        ListHeaderComponent={() => (
-          <View className="flex my-6 px-4 space-y-6">
-            <View className="flex justify-between items-start flex-row mb-6">
-              <View>
-                <Text className="font-pmedium text-lg text-black mt-3">
-                {selectedLang == 0
-                      ? translation[0].English
-                      : selectedLang == 1
-                      ? translation[0].Tamil
-                      : selectedLang == 2
-                      ? translation[0].Hindi
-                      : selectedLang == 3
-                      ? translation[0].Punjabi
-                      : selectedLang == 4
-                      ? translation[0].Urdu
-                      : null}
-                </Text>
-                <Text className="px-2 text-3xl font-psemibold mt-2 text-black">
-                Krishi Yog
-                </Text>
-              </View>
-              <View className="mt-1.5">
+      <SafeAreaView className="bg-white">
+        <FlatList
+          data={posts}
+          keyExtractor={(item) => item.$id}
+          renderItem={({ item }) => (
+            <ImageCard
+              title={item.title}
+              image={item.image}
+              creator={item.creator.username}
+              avatar={item.creator.avatar}
+            />
+          )}
+          ListHeaderComponent={() => (
+            <View className="flex my-6 px-4 space-y-6">
+              <View className="flex justify-between items-start flex-row mb-6">
+                <View>
+                  <Text className="font-pmedium text-lg text-black mt-3">
+                    Welcome Back
+                  </Text>
+                  <Text className="px-2 text-4xl font-psemibold mt-2 text-black">
+                    Krishi Yog
+                  </Text>
+                </View>
+                <View className="mt-1.5">
                   <Pressable
                     onPress={() => {
                       setLangModalVisible(!langModalVisible);
@@ -83,48 +73,33 @@ const Home = () => {
                     }}
                   />
                 </View>
-              <View className="mt-1.5">
-                <Image
-                  source={{ uri: "https://imgs.search.brave.com/DLJHBk3Fk9_f-ljzS9NgwTmnNZoXcMADExv3mQsqNeo/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9jZG4u/dmVjdG9yc3RvY2su/Y29tL2kvcHJldmll/dy0xeC81MS80MS9m/dW5ueS1jYXJ0b29u/LWZhcm1lci1sb2dv/LWFncmljdWx0dXJl/LWZhcm1pbmctdmVj/dG9yLTI3MjQ1MTQx/LmpwZw" }}
-                  style={{ width: 100, height: 90, paddingTop: "20px" }}
-                  resizeMode="contain"
-                />
+                <View className="mt-1.5">
+                  <Image
+                    source={{
+                      uri: "https://imgs.search.brave.com/DLJHBk3Fk9_f-ljzS9NgwTmnNZoXcMADExv3mQsqNeo/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9jZG4u/dmVjdG9yc3RvY2su/Y29tL2kvcHJldmll/dy0xeC81MS80MS9m/dW5ueS1jYXJ0b29u/LWZhcm1lci1sb2dv/LWFncmljdWx0dXJl/LWZhcm1pbmctdmVj/dG9yLTI3MjQ1MTQx/LmpwZw",
+                    }}
+                    style={{ width: 100, height: 90, paddingTop: "20px" }}
+                    resizeMode="contain"
+                  />
+                </View>
               </View>
+
+              {/* Add Weather component here */}
+              {/*  <Weather />   */}
+
+              <Text className="text-2xl font-pregular text-black mb-3">
+                Predict
+              </Text>
             </View>
-
-
-
-            {/* Add Weather component here */}
-           {/*  <Weather />   */}
-
-
-
-
-
-
-            <Text className="text-2xl font-pregular text-black mb-3">
-            {selectedLang == 0
-                      ? translation[3].English
-                      : selectedLang == 1
-                      ? translation[3].Tamil
-                      : selectedLang == 2
-                      ? translation[3].Hindi
-                      : selectedLang == 3
-                      ? translation[3].Punjabi
-                      : selectedLang == 4
-                      ? translation[3].Urdu
-                      : null}
-            </Text>
-          </View>
-        )}
-        ListEmptyComponent={() => (
-          <EmptyState title="No Post Found" subtitle="No Post created yet" />
-        )}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      />
-    </SafeAreaView>
+          )}
+          ListEmptyComponent={() => (
+            <EmptyState title="No Post Found" subtitle="No Post created yet" />
+          )}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        />
+      </SafeAreaView>
     </GestureHandlerRootView>
   );
 };

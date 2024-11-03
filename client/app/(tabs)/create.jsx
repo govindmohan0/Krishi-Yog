@@ -1,26 +1,14 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { router } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import { SafeAreaView } from "react-native-safe-area-context";
-import {
-  View,
-  Text,
-  Alert,
-  TouchableOpacity,
-  ScrollView,
-  Image,
-} from "react-native";
-import { translation } from "../../components/utils"
+import { View, Text, Alert, TouchableOpacity, Image } from "react-native";
+
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
-
-
 import { icons } from "../../constants";
 import { createImagePost } from "../../lib/appwrite";
 import { CustomButton, FormField } from "../../components";
 import { useGlobalContext } from "../../context/GlobalProvider";
-
-
 
 const Create = () => {
   const { user } = useGlobalContext();
@@ -31,10 +19,6 @@ const Create = () => {
     prompt: "",
   });
 
-
-  
-
-  // Request permissions for the Image Picker
   const requestPermission = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
@@ -45,7 +29,6 @@ const Create = () => {
     }
   };
 
-  // Open the image picker
   const openPicker = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -57,7 +40,7 @@ const Create = () => {
     if (!result.canceled) {
       setForm({
         ...form,
-        image: result.assets[0],
+        image: result.uri || result.assets[0]?.uri, // Updated to handle new API structure
       });
     } else {
       Alert.alert("No image selected");
@@ -69,8 +52,10 @@ const Create = () => {
   useEffect(() => {
     getLang();
   }, []);
+
   const getLang = async () => {
-    setSelectedLang(parseInt(await AsyncStorage.getItem("LANG")));
+    const lang = await AsyncStorage.getItem("LANG");
+    setSelectedLang(parseInt(lang, 10));
   };
 
   const submit = async () => {
@@ -83,13 +68,13 @@ const Create = () => {
       await createImagePost({
         ...form,
         userId: user.$id,
-        imageUrl: form.image.uri, // Assuming your backend requires an image URL
+        imageUrl: form.image,
       });
 
       Alert.alert("Success", "Image post uploaded successfully");
       router.push("/home");
     } catch (error) {
-      Alert.alert("Error", error.message);
+      Alert.alert("Error", error?.message || "An error occurred");
     } finally {
       setForm({
         title: "",
@@ -102,82 +87,72 @@ const Create = () => {
   };
 
   return (
-    <SafeAreaView className="bg-white h-full">
-      <ScrollView className="px-4 my-6">
-        <Text className="text-2xl text-black font-psemibold mb-6">{selectedLang == 0
-                      ? translation[1].English
-                      : selectedLang == 1
-                      ? translation[1].Tamil
-                      : selectedLang == 2
-                      ? translation[1].Hindi
-                      : selectedLang == 3
-                      ? translation[1].Punjabi
-                      : selectedLang == 4
-                      ? translation[1].Urdu
-                      : null}</Text>
+    <SafeAreaView style={{ backgroundColor: "white", flex: 1 }}>
+      <View style={{ padding: 16, marginTop: 24 }}>
+        <Text
+          style={{
+            fontSize: 24,
+            color: "black",
+            fontWeight: "600",
+            marginBottom: 16,
+          }}
+        >
+          Upload Image
+        </Text>
         <FormField
+          title="Image Title"
+          value={form.title}
+          placeholder="Give your image a catchy title..."
+          handleChangeText={(e) => setForm({ ...form, title: e })}
+          otherStyles={{ marginTop: 10 }}
+          color="black"
+        />
 
-        
-  title={selectedLang == 0
-    ? translation[4].English
-    : selectedLang == 1
-    ? translation[4].Tamil
-    : selectedLang == 2
-    ? translation[4].Hindi
-    : selectedLang == 3
-    ? translation[4].Punjabi
-    : selectedLang == 4
-    ? translation[4].Urdu
-    : null}
-  className="text-black"  // This will be displayed in black
-  value={form.title}
-  placeholder={selectedLang == 0
-    ? translation[5].English
-    : selectedLang == 1
-    ? translation[5].Tamil
-    : selectedLang == 2
-    ? translation[5].Hindi
-    : selectedLang == 3
-    ? translation[5].Punjabi
-    : selectedLang == 4
-    ? translation[5].Urdu
-    : null}
-  handleChangeText={(e) => setForm({ ...form, title: e })}
-  otherStyles={{ marginTop: 10 }}
-  color="black"  // Ensure the title text color is black
-/>
-
-
-        <View className="mt-7 space-y-2">
-          <Text className="text-base text-black font-pmedium">
-          {selectedLang == 0
-                      ? translation[1].English
-                      : selectedLang == 1
-                      ? translation[1].Tamil
-                      : selectedLang == 2
-                      ? translation[1].Hindi
-                      : selectedLang == 3
-                      ? translation[1].Punjabi
-                      : selectedLang == 4
-                      ? translation[1].Urdu
-                      : null}
+        <View style={{ marginTop: 28 }}>
+          <Text style={{ fontSize: 16, color: "black", fontWeight: "500" }}>
+            Upload Image
           </Text>
-
-          <TouchableOpacity onPress={openPicker} >
+          <TouchableOpacity onPress={openPicker}>
             {form.image ? (
               <Image
-                source={{ uri: form.image.uri }}
+                source={{ uri: form.image }}
                 resizeMode="cover"
-                className="w-full h-64 rounded-2xl mb-7"
+                style={{
+                  width: "100%",
+                  height: 256,
+                  borderRadius: 16,
+                  marginTop: 16,
+                }}
               />
             ) : (
-              <View className="w-full h-40 px-4 bg-black-100 rounded-2xl border border-black-200 flex justify-center items-center">
-                <View className="w-14 h-14 border border-dashed border-secondary-100 flex justify-center items-center">
+              <View
+                style={{
+                  width: "100%",
+                  height: 160,
+                  padding: 16,
+                  backgroundColor: "#f0f0f0",
+                  borderRadius: 16,
+                  borderColor: "#ccc",
+                  borderWidth: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <View
+                  style={{
+                    width: 56,
+                    height: 56,
+                    borderColor: "#ddd",
+                    borderWidth: 1,
+                    borderStyle: "dashed",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
                   <Image
                     source={icons.upload}
                     resizeMode="contain"
-                    alt="upload"
-                    className="w-1/2 h-1/2"
+                    style={{ width: "50%", height: "50%" }}
                   />
                 </View>
               </View>
@@ -186,22 +161,12 @@ const Create = () => {
         </View>
 
         <CustomButton
-          title={selectedLang == 0
-            ? translation[6].English
-            : selectedLang == 1
-            ? translation[6].Tamil
-            : selectedLang == 2
-            ? translation[6].Hindi
-            : selectedLang == 3
-            ? translation[6].Punjabi
-            : selectedLang == 4
-            ? translation[6].Urdu
-            : null}
+          title="Submit & Publish"
           handlePress={submit}
           containerStyles="mt-7"
           isLoading={uploading}
         />
-      </ScrollView>
+      </View>
     </SafeAreaView>
   );
 };
